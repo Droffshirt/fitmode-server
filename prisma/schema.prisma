@@ -1,0 +1,211 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                 String           @id @default(uuid())
+  email              String           @unique
+  passwordHash       String
+  name               String
+  role               Role             @default(USER)
+  gender             Gender?
+  age                Int?
+  weight             Float?           // kg
+  height             Float?           // cm
+  goal               Goal?
+  experienceLevel    Experience?
+  equipment          Equipment?
+  trainingDays       Int?             @default(3)
+  injuries           String?          // JSON array of injuries
+  subscriptionType   Subscription     @default(FREE)
+  onboardingComplete Boolean          @default(false)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  workoutPlans        WorkoutPlan[]
+  exerciseLogs        ExerciseLog[]
+  progressMetrics     ProgressMetric[]
+  coachClients        CoachClient[]    @relation("coach")
+  clientCoaches       CoachClient[]    @relation("client")
+  exercisePreferences UserExercisePreference[]
+}
+
+model WorkoutPlan {
+  id            String       @id @default(uuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  programType   String       // e.g., "upper_lower", "push_pull_legs", "full_body", "glute_specialization"
+  goal          Goal
+  difficulty    String
+  durationWeeks Int          @default(8)
+  currentWeek   Int          @default(1)
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+
+  workoutDays   WorkoutDay[]
+}
+
+model WorkoutDay {
+  id            String            @id @default(uuid())
+  workoutPlanId String
+  workoutPlan   WorkoutPlan       @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
+  dayNumber     Int               // e.g., 1, 2, 3, 4
+  name          String            // e.g., "Upper Body A"
+  focusArea     String            // e.g., "Chest, Back, Arms"
+
+  workoutExercises WorkoutExercise[]
+}
+
+model WorkoutExercise {
+  id            String          @id @default(uuid())
+  workoutDayId  String
+  workoutDay    WorkoutDay      @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
+  exerciseId    String
+  exercise      Exercise        @relation(fields: [exerciseId], references: [id])
+  orderIndex    Int
+  sets          Int
+  targetReps    String          // e.g., "8-12", "12-15"
+  restSeconds   Int             @default(60)
+  notes         String?
+  slot          String?         // "compound_primary", "compound_secondary", "isolation", "core"
+  alternatives  String?         // JSON: ordered list of exerciseIds ranked by compatibility
+
+  exerciseLogs  ExerciseLog[]
+}
+
+model Exercise {
+  id                String            @id @default(uuid())
+  name              String            @unique
+  muscleGroup       MuscleGroup
+  secondaryMuscles  String?           // JSON array
+  equipment         Equipment
+  difficulty        Difficulty
+  movementPattern   String            // push, pull, hinge, squat, lunge, carry, isolation
+  isCompound        Boolean           @default(false)
+  contraindications String?           // JSON array
+  coachingCues      String?           // JSON array
+  demoUrl           String?
+
+  workoutExercises  WorkoutExercise[]
+  preferredBy       UserExercisePreference[]
+}
+
+model UserExercisePreference {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slotKey     String   // e.g. "push_day_compound_primary"
+  exerciseId  String
+  exercise    Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  usedCount   Int      @default(1)
+  lastUsedAt  DateTime @default(now())
+
+  @@unique([userId, slotKey])
+}
+
+model ExerciseLog {
+  id                String          @id @default(uuid())
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workoutExerciseId String
+  workoutExercise   WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+  setNumber         Int
+  weightUsed        Float?          // in kg
+  repsCompleted     Int?
+  rir               Int?            // reps in reserve
+  completed         Boolean         @default(false)
+  notes             String?
+  loggedAt          DateTime        @default(now())
+}
+
+model ProgressMetric {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bodyWeight       Float?   // in kg
+  waistMeasurement Float?   // in cm
+  hipMeasurement   Float?   // in cm
+  notes            String?
+  photoUrl         String?
+  energyLevel      Int?     // 1 to 5
+  recordedAt       DateTime @default(now())
+}
+
+model CoachClient {
+  id        String   @id @default(uuid())
+  coachId   String
+  coach     User     @relation("coach", fields: [coachId], references: [id], onDelete: Cascade)
+  clientId  String
+  client    User     @relation("client", fields: [clientId], references: [id], onDelete: Cascade)
+  status    String   @default("active") // "active", "paused", "cancelled"
+  startedAt DateTime @default(now())
+
+  @@unique([coachId, clientId])
+}
+
+enum Role {
+  USER
+  COACH
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum Goal {
+  FAT_LOSS
+  MUSCLE_GAIN
+  GLUTE_GROWTH
+  TONING
+  ATHLETICISM
+  CONSISTENCY
+}
+
+enum Experience {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum Equipment {
+  GYM
+  HOME
+  MINIMAL
+  BOTH
+}
+
+enum Subscription {
+  FREE
+  PREMIUM
+  COACH
+}
+
+enum MuscleGroup {
+  CHEST
+  BACK
+  SHOULDERS
+  BICEPS
+  TRICEPS
+  QUADS
+  HAMSTRINGS
+  GLUTES
+  CALVES
+  ABS
+  OBLIQUES
+  FULL_BODY
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}

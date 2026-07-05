@@ -1,0 +1,37 @@
+# Dependency directories
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Debug and log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Prisma generated seed files (compiled locally)
+/prisma/seed.js
+/prisma/seed.js.map
+/prisma/seed.d.ts
+/prisma/seed.d.ts.map
+
+# IDEs and editors
+.idea/
+.vscode/
+*.suo
+*.ntvsca
+*.njsproj
+*.sln
+*.sw?
+
+# OS metadata
+.DS_Store
+Thumbs.db
