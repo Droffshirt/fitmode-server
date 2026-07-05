@@ -20,22 +20,8 @@ const app = express();
 app.use(helmet());
 app.use(cors({
   origin: (origin, callback) => {
-    const normalizedOrigin = origin ? origin.replace(/\/$/, '') : '';
-    const clientUrl = env.CLIENT_URL ? env.CLIENT_URL.replace(/\/$/, '') : '';
-
-    // Allow development origins, configured CLIENT_URL, and the Render backend URL
-    if (
-      !origin ||
-      origin.startsWith('http://localhost:') ||
-      origin.startsWith('http://127.0.0.1:') ||
-      origin.startsWith('http://192.168.') ||
-      normalizedOrigin === clientUrl ||
-      normalizedOrigin === 'https://fitmode-server.onrender.com'
-    ) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
+    // Allow all origins for now
+    callback(null, true);
   },
   credentials: true,
 }));
