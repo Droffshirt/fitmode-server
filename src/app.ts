@@ -45,6 +45,11 @@ app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'healthy', env: env.NODE_ENV });
 });
 
+// Ping Check
+app.get('/ping', (_req, res) => {
+  res.status(200).json({ message: 'pong', timestamp: new Date().toISOString() });
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
