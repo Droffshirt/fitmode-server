@@ -285,6 +285,10 @@ export const getWorkoutHistory = async (req: AuthRequest, res: Response, next: N
 export const getWorkoutExerciseAlternatives = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { workoutExerciseId } = req.params;
+    if (typeof workoutExerciseId !== 'string') {
+      throw ApiError.badRequest('Invalid workout exercise ID');
+    }
+
     const we = await prisma.workoutExercise.findUnique({
       where: { id: workoutExerciseId }
     });
