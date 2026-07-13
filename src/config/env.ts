@@ -12,5 +12,6 @@ export const env = {
   SMTP_PORT: parseInt(process.env.SMTP_PORT || '587', 10),
   SMTP_USER: process.env.SMTP_USER || '',
   SMTP_PASS: process.env.SMTP_PASS || '',
-  EMAIL_FROM: process.env.EMAIL_FROM || 'noreply@fitmode.com',
+  EMAIL_FROM: process.env.EMAIL_FROM || 'onboarding@resend.dev',
+  RESEND_API_KEY: process.env.RESEND_API_KEY || '',
 };
