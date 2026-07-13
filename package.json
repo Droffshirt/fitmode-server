@@ -27,6 +27,7 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
+    "nodemailer": "^9.0.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -36,6 +37,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/node": "^25.8.0",
+    "@types/nodemailer": "^8.0.1",
     "nodemon": "^3.1.14",
     "prisma": "^6.4.0",
     "tsx": "^4.22.1",

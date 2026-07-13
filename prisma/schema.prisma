@@ -24,6 +24,8 @@ model User {
   injuries           String?          // JSON array of injuries
   subscriptionType   Subscription     @default(FREE)
   onboardingComplete Boolean          @default(false)
+  resetPasswordToken  String?          @unique
+  resetPasswordExpires DateTime?
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
 
